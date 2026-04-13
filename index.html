@@ -6,7 +6,7 @@
 <title>MLBB Team Finder</title>
 
 <style>
-body{
+body {
     background:#111827;
     color:white;
     font-family:Arial,sans-serif;
@@ -14,7 +14,7 @@ body{
     text-align:center;
 }
 
-.box{
+.box {
     max-width:350px;
     margin:auto;
     background:#1f2937;
@@ -22,7 +22,7 @@ body{
     padding:20px;
 }
 
-input,select{
+input, select {
     width:100%;
     padding:12px;
     margin-top:10px;
@@ -33,7 +33,7 @@ input,select{
     box-sizing:border-box;
 }
 
-button{
+button {
     width:100%;
     margin-top:15px;
     padding:12px;
@@ -42,9 +42,10 @@ button{
     background:#f59e0b;
     color:black;
     font-weight:bold;
+    cursor: pointer;
 }
 
-#status{
+#status {
     margin-top:15px;
     color:#34d399;
 }
@@ -76,10 +77,12 @@ button{
     <p id="status"></p>
 </div>
 
+<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const supabase = window.supabase.createClient(
+// O'zgaruvchi nomini 'supabaseClient' deb o'zgartirdik, to'qnashuv bo'lmasligi uchun
+const supabaseClient = window.supabase.createClient(
   "https://mwndfdcsunctrgyaaguh.supabase.co",
   "sb_publishable_wNIGrNUoRcUfetWpED-GXg_01XqBtAX"
 );
@@ -89,14 +92,22 @@ async function saveData() {
   const rank = document.getElementById("rank").value;
   const role = document.getElementById("role").value;
 
-  const { error } = await supabase
+  if (!nickname) {
+    document.getElementById("status").innerText = "Nickname kiriting!";
+    return;
+  }
+
+  // Bu yerda ham 'supabaseClient' ishlatilishi shart
+  const { error } = await supabaseClient
     .from("players")
     .insert([{ nickname, rank, role }]);
 
   if (error) {
-    document.getElementById("status").innerText = error.message;
+    console.error(error);
+    document.getElementById("status").innerText = "Xato: " + error.message;
   } else {
-    document.getElementById("status").innerText = "Saqlandi!";
+    document.getElementById("status").innerText = "Muvaffaqiyatli saqlandi! ✅";
+    document.getElementById("nickname").value = ""; // Inputni tozalash
   }
 }
 </script>
