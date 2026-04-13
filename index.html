@@ -36,44 +36,44 @@
 <!-- Supabase SDK -->
 <script src="https://jsdelivr.net"></script>
 
-<script>
-    // 1. O'zgaruvchi nomini mutlaqo boshqa qildik
-    const myClient = window.supabase.createClient(
-        "https://supabase.co",
-        "sb_publishable_wNIGrNUoRcUfetWpED-GXg_01XqBtAX"
-    );
+// 1. Supabase sozlamalari
+const SB_URL = "https://mwdnfdcsunctrgyaaguh.supabase.co"; // Rasmda ko'ringan URL
+const SB_KEY = "sb_publishable_wNIGrNUoRcUfetWpED-GXg_O1XqBtAX"; // O'sha uzun API keyni shu tirnoq ichiga qo'ying
 
-    // 2. Funksiyani onclick bilan emas, listener bilan ulaymiz (bu xatolarni kamaytiradi)
-    document.getElementById('saveBtn').addEventListener('click', async () => {
-        const nickname = document.getElementById("nickname").value;
-        const rank = document.getElementById("rank").value;
-        const role = document.getElementById("role").value;
-        const statusEl = document.getElementById("status");
+// 2. Client yaratish
+const mlbbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-        if (!nickname) {
-            statusEl.innerText = "Iltimos, Nickname kiriting!";
-            return;
+// 3. Ma'lumotni saqlash funksiyasi
+async function saveData() {
+    const nick = document.getElementById("nickname").value;
+    const rnk = document.getElementById("rank").value;
+    const rle = document.getElementById("role").value;
+    const status = document.getElementById("status");
+
+    if (!nick) {
+        status.innerText = "Iltimos, Nickname kiriting!";
+        return;
+    }
+
+    status.innerText = "Saqlanmoqda...";
+
+    try {
+        const { error } = await mlbbClient
+            .from("players")
+            .insert([{ nickname: nick, rank: rnk, role: rle }]);
+
+        if (error) {
+            status.innerText = "Xato: " + error.message;
+            console.error(error);
+        } else {
+            status.innerText = "Muvaffaqiyatli saqlandi! ✅";
+            document.getElementById("nickname").value = "";
         }
-
-        statusEl.innerText = "Yuborilmoqda...";
-
-        try {
-            const { error } = await myClient
-                .from("players")
-                .insert([{ nickname, rank, role }]);
-
-            if (error) {
-                statusEl.innerText = "Xato: " + error.message;
-            } else {
-                statusEl.innerText = "Muvaffaqiyatli saqlandi! ✅";
-                document.getElementById("nickname").value = "";
-            }
-        } catch (err) {
-            statusEl.innerText = "Ulanishda xatolik!";
-            console.error(err);
-        }
-    });
-</script>
+    } catch (err) {
+        status.innerText = "Ulanishda xatolik yuz berdi.";
+        console.error(err);
+    }
+}
 
 </body>
 </html>
