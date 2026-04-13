@@ -9,7 +9,7 @@
         .box { max-width:350px; margin:auto; background:#1f2937; border-radius:20px; padding:20px; }
         input, select { width:100%; padding:12px; margin-top:10px; border:none; border-radius:10px; background:#374151; color:white; box-sizing:border-box; }
         button { width:100%; margin-top:15px; padding:12px; border:none; border-radius:10px; background:#f59e0b; color:black; font-weight:bold; cursor:pointer; }
-        #status { margin-top:15px; color:#34d399; }
+        #status { margin-top:15px; color:#34d399; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -29,51 +29,56 @@
         <option>Roamer</option>
         <option>Jungle</option>
     </select>
-    <button id="saveBtn">Save</button>
+    <button onclick="saveData()">Save</button>
     <p id="status"></p>
 </div>
 
-<!-- Supabase SDK -->
+<!-- Supabase SDK - BU JUDA MUHIM -->
 <script src="https://jsdelivr.net"></script>
 
-// 1. Supabase sozlamalari
-const SB_URL = "https://mwdnfdcsunctrgyaaguh.supabase.co"; // Rasmda ko'ringan URL
-const SB_KEY = "sb_publishable_wNIGrNUoRcUfetWpED-GXg_O1XqBtAX"; // O'sha uzun API keyni shu tirnoq ichiga qo'ying
+<script>
+    // Siz yuborgan ma'lumotlar bilan sozladim
+    const SB_URL = "https://mwndfdcsunctrgyaaguh.supabase.co"; 
+    const SB_KEY = "sb_publishable_wNIGrNUoRcUfetWpED-GXg_01XqBtAX";
 
-// 2. Client yaratish
-const mlbbClient = window.supabase.createClient(SB_URL, SB_KEY);
+    const mlbbClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-// 3. Ma'lumotni saqlash funksiyasi
-async function saveData() {
-    const nick = document.getElementById("nickname").value;
-    const rnk = document.getElementById("rank").value;
-    const rle = document.getElementById("role").value;
-    const status = document.getElementById("status");
+    async function saveData() {
+        const nickname = document.getElementById("nickname").value;
+        const rank = document.getElementById("rank").value;
+        const role = document.getElementById("role").value;
+        const statusEl = document.getElementById("status");
 
-    if (!nick) {
-        status.innerText = "Iltimos, Nickname kiriting!";
-        return;
-    }
-
-    status.innerText = "Saqlanmoqda...";
-
-    try {
-        const { error } = await mlbbClient
-            .from("players")
-            .insert([{ nickname: nick, rank: rnk, role: rle }]);
-
-        if (error) {
-            status.innerText = "Xato: " + error.message;
-            console.error(error);
-        } else {
-            status.innerText = "Muvaffaqiyatli saqlandi! ✅";
-            document.getElementById("nickname").value = "";
+        if (!nickname) {
+            statusEl.innerText = "Iltimos, Nickname kiriting!";
+            statusEl.style.color = "#f87171";
+            return;
         }
-    } catch (err) {
-        status.innerText = "Ulanishda xatolik yuz berdi.";
-        console.error(err);
+
+        statusEl.innerText = "Saqlanmoqda...";
+        statusEl.style.color = "#fbbf24";
+
+        try {
+            const { error } = await mlbbClient
+                .from("players")
+                .insert([{ nickname, rank, role }]);
+
+            if (error) {
+                statusEl.innerText = "Xato: " + error.message;
+                statusEl.style.color = "#f87171";
+                console.error("Supabase xatosi:", error);
+            } else {
+                statusEl.innerText = "Muvaffaqiyatli saqlandi! ✅";
+                statusEl.style.color = "#34d399";
+                document.getElementById("nickname").value = "";
+            }
+        } catch (err) {
+            statusEl.innerText = "Ulanishda xatolik!";
+            statusEl.style.color = "#f87171";
+            console.error("Catch xatosi:", err);
+        }
     }
-}
+</script>
 
 </body>
 </html>
